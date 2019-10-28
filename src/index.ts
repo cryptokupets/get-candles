@@ -1,5 +1,6 @@
 import { Exchange as Hitbtc } from "hitbtc-connect";
 import moment from "moment";
+import { Readable } from "stream";
 
 const exchanges: any = {
   hitbtc: new Hitbtc()
@@ -30,21 +31,21 @@ interface IMarketDataSource {
   }): Promise<ICandle[]>;
 }
 
-export function getPairs(
+export function readPairs(
   exchange: string
 ): Promise<Array<{ currency: string; asset: string }>> {
   return getExchange(exchange).getPairs();
 }
 
-export function getPeriods(exchange: string): Promise<number[]> {
+export function readPeriods(exchange: string): Promise<number[]> {
   return getExchange(exchange).getPeriods();
 }
 
-export function getExchanges(): string[] {
+export function readExchanges(): string[] {
   return Object.keys(exchanges);
 }
 
-export async function getCandles({
+export function readCandlesStream({
   exchange,
   currency,
   asset,
@@ -56,32 +57,30 @@ export async function getCandles({
   currency: string;
   asset: string;
   period: number;
-  start: string;
-  end: string;
-}): Promise <ICandle[]> {
+  start?: string;
+  end?: string;
+}): Readable {
   let startMoment = moment.utc(start);
-
-  const candles: ICandle[] = [];
-  let responseLength;
-
-  do {
-    const response = await getExchange(exchange).getCandles({
-      currency,
-      asset,
-      period,
-      start: startMoment.toISOString(),
-      end
-    });
-
-    responseLength = response.length;
-    if (responseLength) {
-      for (const candle of response) {
-        candles.push(candle);
+  const rs = new Readable({
+    read: async () => {
+      if (startMoment.isSameOrBefore(moment.utc(end))) {
+        const response = await getExchange(exchange).getCandles({
+          currency,
+          asset,
+          period,
+          start: startMoment.toISOString(),
+          end
+        });
+        startMoment = moment
+          .utc(response[response.length - 1].time)
+          .add(period, "m");
+        if (response.length) {
+          rs.push(JSON.stringify(response));
+        }
+      } else {
+        rs.push(null);
       }
-      startMoment = moment
-        .utc(response[responseLength - 1].time)
-        .add(period, "m");
     }
-  } while (responseLength && startMoment.isSameOrBefore(moment.utc(end)));
-  return candles;
+  });
+  return rs;
 }

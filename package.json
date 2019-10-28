@@ -1,6 +1,6 @@
 {
   "name": "get-candles",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.1-alpha.0",
   "description": "Get market data service",
   "repository": {
     "type": "git",
