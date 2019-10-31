@@ -1,6 +1,6 @@
 {
   "name": "get-candles",
-  "version": "1.0.2-alpha.1",
+  "version": "1.0.2-alpha.2",
   "description": "Get market data service",
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
     "hitbtc-connect": "^1.0.0-alpha.6",
     "moment": "^2.24.0"
   },
+  "main": "lib/index.js",
   "devDependencies": {
     "@types/node": "^12.7.4",
     "babel-cli": "^6.26.0",
