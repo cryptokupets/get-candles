@@ -1,6 +1,6 @@
 {
   "name": "get-candles",
-  "version": "1.0.2-alpha.0",
+  "version": "1.0.2-alpha.1",
   "description": "Get market data service",
   "repository": {
     "type": "git",
@@ -41,5 +41,8 @@
     "mocha": "^6.2.1",
     "tslint": "^5.19.0",
     "typescript": "^3.6.2"
-  }
+  },
+  "files": [
+    "lib/**/*"
+  ]
 }
