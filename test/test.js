@@ -1,27 +1,27 @@
 require("mocha");
 const { assert } = require("chai");
 const {
-  readPairs,
-  readPeriods,
-  readExchanges,
-  readCandlesStream
+  getPairs,
+  getPeriods,
+  getExchanges,
+  streamCandle
 } = require("../lib/index");
 
 const exchange = "hitbtc";
 
-describe("readExchanges", () => {
-  it("readExchanges является сервисом", function() {
-    assert.isFunction(readExchanges);
-    const exchanges = readExchanges();
+describe("getExchanges", () => {
+  it("getExchanges является сервисом", function() {
+    assert.isFunction(getExchanges);
+    const exchanges = getExchanges();
     assert.isArray(exchanges);
     assert.include(exchanges, "hitbtc");
   });
 });
 
-describe("readPairs", () => {
-  it("Если выполнить запрос readPairs, то вернется список поддерживаемых пар", function(done) {
-    assert.isFunction(readPairs);
-    readPairs(exchange).then(pairs => {
+describe("getPairs", () => {
+  it("Если выполнить запрос getPairs, то вернется список поддерживаемых пар", function(done) {
+    assert.isFunction(getPairs);
+    getPairs(exchange).then(pairs => {
       assert.isNotEmpty(pairs);
 
       const pair = pairs[0];
@@ -31,10 +31,10 @@ describe("readPairs", () => {
   });
 });
 
-describe("readPeriods", () => {
+describe("getPeriods", () => {
   it("Если выполнить запрос readPeriods, то вернется список чисел", function(done) {
-    assert.isFunction(readPeriods);
-    readPeriods(exchange).then(periods => {
+    assert.isFunction(getPeriods);
+    getPeriods(exchange).then(periods => {
       assert.isNotEmpty(periods);
 
       const period = periods[0];
@@ -44,8 +44,8 @@ describe("readPeriods", () => {
   });
 });
 
-describe("readCandlesStream", () => {
-  it("Если выполнить запрос readCandlesStream, то вернется Reader с элементами типа ICandle", function(done) {
+describe("streamCandle", () => {
+  it("Если выполнить запрос streamCandle, то вернется Reader с элементами типа ICandle", function(done) {
     this.timeout(5000);
     let i = 0;
     const options = {
@@ -56,7 +56,7 @@ describe("readCandlesStream", () => {
       start: "2019-10-01",
       end: "2019-10-02"
     };
-    const rs = readCandlesStream(options);
+    const rs = streamCandle(options);
     rs.on("data", chunk => {
       const candles = JSON.parse(chunk.toString());
       assert.isArray(candles);

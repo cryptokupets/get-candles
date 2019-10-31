@@ -31,21 +31,21 @@ interface IMarketDataSource {
   }): Promise<ICandle[]>;
 }
 
-export function readPairs(
+export function getPairs(
   exchange: string
 ): Promise<Array<{ currency: string; asset: string }>> {
   return getExchange(exchange).getPairs();
 }
 
-export function readPeriods(exchange: string): Promise<number[]> {
+export function getPeriods(exchange: string): Promise<number[]> {
   return getExchange(exchange).getPeriods();
 }
 
-export function readExchanges(): string[] {
+export function getExchanges(): string[] {
   return Object.keys(exchanges);
 }
 
-export function readCandlesStream({
+export function streamCandle({
   exchange,
   currency,
   asset,
