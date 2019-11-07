@@ -84,4 +84,32 @@ describe("streamCandle", () => {
       done();
     });
   });
+
+  it("если end не указана, то будет выполняться по мере поступления новых данных", function(done) {
+    this.timeout(80000);
+    let i = 0;
+    const options = {
+      exchange: "hitbtc",
+      currency: "USD",
+      asset: "BTC",
+      period: 1,
+      start: "2019-11-07T18:10:00"
+    };
+    const rs = streamCandle(options);
+    rs.on("data", chunk => {
+      i++;
+    });
+
+    setTimeout(() => rs.destroy(), 70000);
+
+    rs.on("end", () => {
+      assert.fail("не должен завершиться");
+      done();
+    });
+
+    rs.on("close", () => {
+      assert.isAbove(i, 1, "как минимум второй раз");
+      done();
+    });
+  });
 });
