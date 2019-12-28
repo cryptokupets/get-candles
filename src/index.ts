@@ -65,11 +65,21 @@ export function streamCandle({
     read: async () => {
       if (!end) {
         const now = moment().utc();
-        const delay = Math.max(moment(startMoment).add(period, "m").diff(now), 0);
+        const delay = Math.max(
+          moment(startMoment)
+            .add(period, "m")
+            .diff(now),
+          0
+        );
         setTimeout(async () => {
           const nowMoment = moment().utc();
-          const minutes = Math.floor(Math.floor(nowMoment.get("m") / period) * period);
-          const endMoment = moment(nowMoment).startOf("h").minute(minutes).add(-1, "s");
+          const minutes = Math.floor(
+            Math.floor(nowMoment.get("m") / period) * period
+          );
+          const endMoment = moment(nowMoment)
+            .startOf("h")
+            .minute(minutes)
+            .add(-1, "s");
 
           const response = await getExchange(exchange).getCandles({
             currency,
@@ -97,10 +107,10 @@ export function streamCandle({
           start: startMoment.toISOString(),
           end
         });
-        startMoment = moment
-          .utc(response[response.length - 1].time)
-          .add(period, "m");
         if (response.length) {
+          startMoment = moment
+            .utc(response[response.length - 1].time)
+            .add(period, "m");
           rs.push(JSON.stringify(response));
         }
       } else {
