@@ -10,7 +10,7 @@ function getExchange(exchange: string): IMarketDataSource {
   return exchanges[exchange] as IMarketDataSource;
 }
 
-interface ICandle {
+export interface ICandle {
   time: string;
   open: number;
   high: number;
@@ -112,6 +112,47 @@ export function streamCandle({
             .utc(response[response.length - 1].time)
             .add(period, "m");
           rs.push(JSON.stringify(response));
+        }
+      } else {
+        rs.push(null);
+      }
+    }
+  });
+  return rs;
+}
+
+export function importCandles({
+  exchange,
+  currency,
+  asset,
+  period,
+  begin,
+  end
+}: {
+  exchange: string;
+  currency: string;
+  asset: string;
+  period: number;
+  begin: string;
+  end: string;
+}): Readable {
+  let beginMoment = moment.utc(begin);
+  const rs = new Readable({
+    objectMode: true,
+    read: async () => {
+      if (beginMoment.isSameOrBefore(moment.utc(end))) {
+        const response = await getExchange(exchange).getCandles({
+          currency,
+          asset,
+          period,
+          start: beginMoment.toISOString(),
+          end
+        });
+        if (response.length) {
+          beginMoment = moment
+            .utc(response[response.length - 1].time)
+            .add(period, "m");
+          rs.push(response);
         }
       } else {
         rs.push(null);
